@@ -1,0 +1,5 @@
+{
+    "dbConfig": {
+        "host": "localhost:8088"
+    }
+}
