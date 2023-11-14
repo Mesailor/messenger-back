@@ -27,4 +27,4 @@ function validate(message) {
 }
 
 module.exports.Message = Message;
-module.exports.validateMessage = validate;
+module.exports.validate = validate;

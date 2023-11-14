@@ -2,7 +2,7 @@ const express = require('express');
 const EventEmitter = require('node:events');
 const router = express.Router();
 const { Chat, validateChat } = require('../models/chats');
-const { validateMessage } = require('../models/messages');
+const validateMessage = require('../models/messages').validate;
 
 
 const emitter = new EventEmitter();

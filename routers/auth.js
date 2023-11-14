@@ -6,10 +6,10 @@ const { User } = require('../models/users');
 router.post('/', async (req, res) => {
     const user = await User.findOne({ name: req.body.name });
     if (!user) {
-        return res.status(400).send('{"text": "Wrong name or pass!"}');
+        return res.status(400).send({ text: "Wrong name or pass!" });
     }
     if (user.password !== req.body.password) {
-        return res.status(400).send('{"text": "Wrong name or pass!"}');
+        return res.status(400).send({ text: "Wrong name or pass!" });
     }
 
     const token = createJwtToken(user);
