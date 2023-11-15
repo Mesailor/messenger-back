@@ -2,14 +2,11 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const cors = require('cors');
-const config = require('config');
+const { port, dbConfig } = require('./config_imported');
 const usersRouter = require('./routers/users');
 const { authRouter } = require('./routers/auth');
 const chatsRouter = require('./routers/chats');
 const auth = require('./middlewares/auth');
-
-const port = config.get('port') || 5000;
-const dbConfig = config.get('dbConfig');
 
 app.use(express.json());
 app.use(cors());

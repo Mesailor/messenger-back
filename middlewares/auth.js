@@ -1,10 +1,11 @@
 const jwt = require('jsonwebtoken');
+const { configKeys } = require('../config_imported');
 
 module.exports = function (req, res, next) {
     const token = req.get('x-auth-token');
 
     try {
-        var decoded = jwt.verify(token, 'jwtPrivateKey');
+        var decoded = jwt.verify(token, configKeys.jwtPrivateKey);
 
         // check: is decoded user exist?
         // if (not exist) {}
