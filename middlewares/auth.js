@@ -1,16 +1,24 @@
 const jwt = require('jsonwebtoken');
+const authService = require('../services/authService');
 
-module.exports = function (req, res, next) {
-    const token = req.get('Authorization').split(' ')[1];
+module.exports = async function (req, res, next) {
+    // const token = req.get('Authorization').split(' ')[1];
+    const token = req.get('x-auth-token')
 
-    try {
-        var decoded = jwt.verify(token, 'jwtPrivateKey');
+    const decoded = await authService.verify(token);
+
+    if (!decoded) {
+        return res.status(401).send({ text: "Unauthorized!"});
+    }
+
+    // try {
+        // var decoded = jwt.verify(token, 'jwtPrivateKey');
 
         // check: is decoded user exist?
         // if (not exist) {}
-    } catch (e) {
-        return res.status(400).send(e);
-    }
+    // } catch (e) {
+    //     return res.status(400).send(e);
+    // }
 
     req.body.id = decoded.id;
     if (req.body.message) {
