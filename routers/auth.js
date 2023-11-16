@@ -4,11 +4,14 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models/users');
 
 router.post('/', async (req, res) => {
-    const user = await User.findOne({ name: req.body.name });
+    const name = req.body.name.toLowerCase();
+    const password = req.body.password;
+
+    const user = await User.findOne({ name });
     if (!user) {
         return res.status(400).send({ text: "Wrong name or pass!" });
     }
-    if (user.password !== req.body.password) {
+    if (user.password !== password) {
         return res.status(400).send({ text: "Wrong name or pass!" });
     }
 

@@ -9,18 +9,23 @@ router.post('', async (req, res) => {
         return res.status(400).send({ text: "Wrong input!" });
     }
 
-    const users = await User.find({ name: value.name });
+    const user = {
+        name: value.name.toLowerCase(),
+        password: value.password
+    }
+
+    const users = await User.find({ name: user.name });
     if (users[0]) {
         return res.status(400).send({ text: "User already exist" });
     }
 
-    const user = new User({
-        name: value.name,
-        password: value.password
+    const newUser = new User({
+        name: user.name,
+        password: user.password
     });
-    await user.save();
+    await newUser.save();
 
-    const token = createJwtToken(user);
+    const token = createJwtToken(newUser);
     return res.send({ token });
 });
 
