@@ -1,30 +1,31 @@
 const { User } = require('../models/users');
 const jwt = require('jsonwebtoken');
+const { configKeys } = require('../config_imported');
 
 class AuthService {
     async checkLogin(name, password) {
-        const user = await User.find({ name });
+        const user = await User.findOne({ name });
         if (!user) {
             return {
-                status: 200,
+                status: 400,
                 response: { text: "Wrong name or password!"}
             }
         }
         if (!(user.password === password)) {
             return {
-                status: 200,
+                status: 400,
                 response: { text: "Wrong name or password!"}
             }
         }
         return {
             status: 200,
-            response: { token: createJwtToken(user)}
+            response: { token: this.createJwtToken(user)}
         }
     }
 
     async verify(token) {
         try {
-            const decoded = jwt.verify(token, 'jwtPrivateKey');
+            const decoded = jwt.verify(token, configKeys.jwtPrivateKey);
 
             const user = await User.findById(decoded.id);
             if (!user) {
@@ -45,7 +46,7 @@ class AuthService {
             password: user.password
         }
     
-        return jwt.sign(payload, 'jwtPrivateKey');
+        return jwt.sign(payload, configKeys.jwtPrivateKey);
     }
 }
 

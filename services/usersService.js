@@ -3,7 +3,12 @@ const authService = require('./authService');
 
 class UserService {
     async create(user) {
-        const { value, error } = validate(user);
+        const candidate = {
+            name: user.name.toLowerCase(),
+            password: user.password
+        }
+
+        const { value, error } = validate(candidate);
         if (error) {
             console.log(error.details[0].message);
             return {
