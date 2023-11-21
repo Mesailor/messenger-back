@@ -1,4 +1,5 @@
 const express = require('express');
+const { configKeys } = require('../config_imported');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const { User } = require('../models/users');
@@ -23,7 +24,12 @@ function createJwtToken(user) {
         password: user.password
     }
 
-    return jwt.sign(jwtuser, 'jwtPrivateKey');
+    try {
+        return jwt.sign(jwtuser, configKeys.jwtPrivateKey);
+    }
+    catch (e) {
+        console.log(e);
+    }
 }
 
 module.exports.authRouter = router;
