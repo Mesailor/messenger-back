@@ -1,37 +1,38 @@
 const express = require('express');
 const router = express.Router();
-const { User, validate } = require('../models/users');
-const { createJwtToken } = require('../routers/auth');
+const usersService = require('../services/usersService');
+// const { User, validate } = require('../models/users');
+// const { createJwtToken } = require('../routers/auth');
 
 router.post('', async (req, res) => {
-    const { value, error } = validate(req.body);
-    if (error) {
-        return res.status(400).send({ text: "Wrong input!" });
-    }
+    // const { value, error } = validate(req.body);
+    // if (error) {
+    //     console.log(error.details[0].message);
+    //     return res.status(400).send({ text: "Wrong input!" });
+    // }
 
-    const user = {
-        name: value.name.toLowerCase(),
-        password: value.password
-    }
+    // const users = await User.find({ name: value.name });
+    // if (users[0]) {
+    //     return res.status(400).send({ text: "User already exist" });
+    // }
 
-    const users = await User.find({ name: user.name });
-    if (users[0]) {
-        return res.status(400).send({ text: "User already exist" });
-    }
+    // const user = new User({
+    //     name: value.name,
+    //     password: value.password
+    // });
+    // await user.save();
 
-    const newUser = new User({
-        name: user.name,
-        password: user.password
-    });
-    await newUser.save();
-
-    const token = createJwtToken(newUser);
-    return res.send({ token });
+    // const token = createJwtToken(user);
+    // return res.send({ token });
+    const { status, response } = await usersService.create(req.body);
+    return res.status(status).send(response)
 });
 
 router.get('', async (req, res) => {
-    const users = await User.find();
-    return res.send(users);
+    // const users = await User.find();
+    // return res.send(users);
+    const {status, response} = await usersService.getAll();
+    return res.status(status).send(response); 
 });
 
 module.exports = router;

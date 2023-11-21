@@ -1,39 +1,40 @@
 const express = require('express');
 const { configKeys } = require('../config_imported');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const { User } = require('../models/users');
+const authService = require('../services/authService');
 
 router.post('/', async (req, res) => {
-    const name = req.body.name.toLowerCase();
-    const password = req.body.password;
+    // const token = await Authentication(req.body.name, req.body.password);
 
-    const user = await User.findOne({ name });
-    if (!user) {
-        return res.status(400).send({ text: "Wrong name or pass!" });
-    }
-    if (user.password !== password) {
-        return res.status(400).send({ text: "Wrong name or pass!" });
-    }
-
-    const token = createJwtToken(user);
-    return res.append('x-auth-token', token).send({ token: token });
+    // if (!token) {
+    //     return res.status(400).send({ text: "Wrong name or pass!" });
+    // } else {
+    //     return res.append('x-auth-token', token).send({ token: token });
+    // }
+    const { status, response } = await authService.checkLogin(req.body.name, req.body.password);
+    return res.status(status).send(response);
 });
 
-function createJwtToken(user) {
-    const jwtuser = {
-        id: user._id,
-        name: user.name,
-        password: user.password
-    }
+// async function Authentication(name, password) {
+//     const user = await User.find({ name });
+//     if (!user) {
+//         return false;
+//     }
+//     if (!(user.password === password)) {
+//         return false;
+//     }
+//     return createJwtToken(user);
+// }
 
-    try {
-        return jwt.sign(jwtuser, configKeys.jwtPrivateKey);
-    }
-    catch (e) {
-        console.log(e);
-    }
-}
+// function createJwtToken(user) {
+//     const payload = {
+//         id: user._id,
+//         name: user.name,
+//         password: user.password
+//     }
+
+//     return jwt.sign(payload, 'jwtPrivateKey');
+// }
 
 module.exports.authRouter = router;
-module.exports.createJwtToken = createJwtToken;
+// module.exports.createJwtToken = createJwtToken; 

@@ -1,44 +1,22 @@
 const express = require('express');
-const EventEmitter = require('node:events');
 const router = express.Router();
-const { Chat, validateChat } = require('../models/chats');
-const validateMessage = require('../models/messages').validate;
-
-
+const chatsService = require('../services/chatsService');
+const EventEmitter = require('node:events');
 const emitter = new EventEmitter();
 
 router.post('/', async (req, res) => {
-    const { value, error } = validateChat(req.body.chat);
-    if (error) {
-        return res.status(400).send(`{"text": "Chat name is required!"}`);
-    }
-
-    if(!value.users.includes(req.body.id)) {
-        value.users.push(req.body.id);
-    }
-
-    const chat = new Chat({
-        name: value.name,
-        users: value.users,
-        messages: []
-    });
-
-    await chat.save();
-    res.send(chat);
+    const { status, response } = await chatsService.create(req.body.chat, req.body.id);
+    return res.status(status).send(response);
 });
 
 router.get('/', async (req, res) => {
-    const chats = await Chat.find({users: req.body.id});
-    res.send(chats);
+    const { status, response } = await chatsService.getAll(req.body.id);
+    return res.status(status).send(response);
 });
 
 router.get('/:id', async (req, res) => {
-    try {
-        const chat = await Chat.findById(req.params.id);
-        return res.send(chat);
-    } catch (e) {
-        return res.status(400).send(e);
-    }
+    const { status, response } = await chatsService.getOne(req.params.id);
+    return res.status(status).send(response);
 });
 
 router.get('/:id/getmessage', (req, res) => {
@@ -48,32 +26,9 @@ router.get('/:id/getmessage', (req, res) => {
 });
 
 router.post('/:id/newmessage', async (req, res) => {
-    try {
-        var chat = await Chat.findById(req.params.id);
-        if (!chat) {
-            return res.status(400).send('Chat does not exist!');
-        }
-    } catch (e) {
-        return res.status(400).send(e);
-    }
-
-    const {value, error} = validateMessage(req.body.message);
-    if (error) {
-        return res.status(400).send(error.details[0].message);
-    }
-
-    const newMessage =  {
-        author: value.author,
-        text: value.text
-    }
-    let messages = chat.messages;
-    messages.push(newMessage);
-    chat.set("messages", messages);
-    await chat.save();
-
-    emitter.emit(`newMessIn${req.params.id}`, newMessage);
-
-    return res.sendStatus(200);
+    const { status, response } = await chatsService.addMessage(req.params.id, req.body.message);
+    emitter.emit(`newMessIn${req.params.id}`, req.body.message);
+    return res.status(status).send(response);
 });
 
 module.exports = router;
